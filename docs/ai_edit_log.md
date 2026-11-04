@@ -154,6 +154,38 @@ For each AI interaction, create a new entry with the following structure:
 
 ---
 
+### 2026-11-04 - CLI Integration and Summary Output
+
+**Context:** The completed loader, quiz strategies, and quiz engine needed to be integrated into a usable command-line application. The CLI had to support long and short arguments, select the requested quiz mode, handle expected loading errors without a traceback, and display a final session summary.
+
+**AI Tool Used:** Claude Code
+
+**Prompt/Request:** I used a structured XML-style prompt asking Claude Code to plan and implement only the CLI integration in `main.py`. The prompt required `argparse`, required mode and file arguments, all three quiz strategies, explicit exit codes, standard-error output for expected failures, a testable `main()` function, and exact summary labels.
+
+**AI Response:** Claude Code added argument parsing, strategy selection, session-summary output, expected error handling, and the executable `main()` entry point. It integrated the existing loader, quiz-mode strategies, and quiz engine without duplicating their logic.
+
+**Changes Made:**
+- Required `parse_arguments()` to accept an optional argument list for direct unit testing
+- Simplified `select_strategy()` so adaptive mode starts with an empty missed-index set
+- Required expected loading and validation errors to be written to standard error as one line
+- Required exact summary labels for total questions, accuracy, and missed terms
+- Preserved the original `main.py` module docstring exactly
+- Added 16 focused CLI tests covering arguments, strategy selection, summary output, successful execution, expected errors, and component integration
+- Formatted `main.py` and `tests/test_main.py` with the project Black configuration
+
+**Reasoning:** Accepting an optional argument list makes argument parsing testable without changing normal command-line behavior. Keeping strategy selection small avoids introducing an unnecessary Factory Pattern. Expected file and validation errors belong on standard error and should return a non-zero exit code without exposing a traceback. Exact summary labels provide predictable output for users and automated tests.
+
+**Outcome:** All 16 CLI tests passed. The complete test suite passed with 70 tests. Total project coverage reached 99% across 688 statements with two missing lines. `main.py` achieved 97% coverage. Black, Flake8, and mypy completed successfully for all ten current Python source files. The `python main.py --help` command displayed the required mode and file options.
+
+**Lessons Learned:**
+- Small orchestration functions make CLI behavior easier to test
+- Expected user errors should produce concise standard-error messages and appropriate exit codes
+- CLI tests should validate both long and short argument forms
+- Existing application components should be integrated rather than reimplemented
+- A technically passing implementation is not complete until real CLI smoke tests and documentation are also verified
+
+---
+
 ## Tips for Effective AI Collaboration
 
 ### 1. Be Specific in Your Requests

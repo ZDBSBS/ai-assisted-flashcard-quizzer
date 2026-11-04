@@ -121,6 +121,39 @@ For each AI interaction, create a new entry with the following structure:
 
 ---
 
+### 2026-11-04 - Quiz Engine and Session Statistics
+
+**Context:** The application required a testable quiz engine that presents flashcards, collects answers, provides immediate feedback, calculates session statistics, and preserves the original indices of incorrectly answered cards for future adaptive sessions.
+
+**AI Tool Used:** Claude Code
+
+**Prompt/Request:** I used a structured XML-style prompt asking Claude Code to plan and implement only the Quiz Engine in `utils/quiz_engine.py`. The prompt required dependency injection for input and output, case-insensitive answer comparison, immediate feedback, typed session statistics, reliable original-index tracking, no changes to the existing loader or strategies, and no CLI or persistence implementation.
+
+**AI Response:** Claude Code proposed a `SessionResult` dataclass and a `QuizEngine` class with an injected strategy, input callable, and output callable. The engine orders cards through the selected strategy, presents each card, compares answers, provides feedback, and returns totals, accuracy, missed terms, and missed original indices.
+
+**Changes Made:**
+- Rejected direct original-index tracking based only on the caller's dictionary identities because the same dictionary instance could appear multiple times
+- Required a separate shallow dictionary copy for every input position before strategy ordering
+- Required exact feedback values of `Correct` and `Incorrect`
+- Required questions to be presented without an invented prefix or prompt string
+- Used `strip().casefold()` for case-insensitive answer comparison
+- Added 19 focused Quiz Engine tests covering results, feedback, comparison, statistics, index tracking, empty input, injected callables, and input preservation
+- Rejected and removed an out-of-scope AI-generated test that expected support for custom strategies returning newly created card dictionaries
+- Added explicit type annotations to two empty card lists in the test suite to satisfy mypy
+
+**Reasoning:** Creating one internal dictionary copy per input position makes original-index tracking reliable even when duplicate card content or repeated dictionary references are supplied. Dependency injection keeps terminal input and output testable without introducing global state. The copied-card strategy test was rejected because the approved Strategy contract reorders the supplied card objects rather than replacing them with unrelated objects. Production code should not be expanded only to satisfy an invented test outside the project requirements.
+
+**Outcome:** All 19 Quiz Engine tests passed, and `utils/quiz_engine.py` achieved 100% coverage with 41 statements and no missing lines. The complete test suite passed with 54 tests. Combined coverage for the current `utils` package reached 99% with 116 statements and one missing abstract-method line. Black, Flake8, and mypy completed successfully for all nine current Python source files.
+
+**Lessons Learned:**
+- Dependency injection makes interactive command-line logic easy to test
+- Original-index tracking must account for duplicate content and repeated object references
+- AI-generated tests must be reviewed against the approved interface and project scope
+- Production code should not be changed merely to satisfy an invented requirement
+- Verified test, coverage, formatter, linter, and type-checking results should be documented immediately
+
+---
+
 ## Tips for Effective AI Collaboration
 
 ### 1. Be Specific in Your Requests

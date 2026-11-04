@@ -73,10 +73,10 @@ For each AI interaction, create a new entry with the following structure:
 - Added validation that the supplied path is a regular file
 - Added validation that whitespace-only `front` and `back` values are rejected
 - Reviewed and corrected formatting to make Black and Flake8 compatible
-- Added `.flake8` with a maximum line length of 88 to match Black's default formatting
+- Added `pyproject.toml` with a Black line length of 79 to align Black with Flake8's default line-length rule
 - Added 17 focused unit tests covering valid inputs, malformed JSON, invalid structures, missing fields, invalid types, empty values, whitespace-only values, additional fields, missing files, and directory paths
 
-**Reasoning:** The initial plan was generally correct, but `any` was not a valid type annotation and rejecting cards with additional fields was not required. Checking only whether a path existed could allow a directory to reach the JSON parser. Checking only for empty strings would also accept values containing only whitespace. The Flake8 configuration was necessary because Black formats code using an 88-character line length while Flake8 defaults to 79 characters.
+**Reasoning:** The initial plan was generally correct, but `any` was not a valid type annotation and rejecting cards with additional fields was not required. Checking only whether a path existed could allow a directory to reach the JSON parser. Checking only for empty strings would also accept values containing only whitespace. The Black configuration was necessary because Black defaults to 88 characters while Flake8 defaults to 79 characters. Configuring Black to use 79 characters removed the formatter and linter conflict without changing Flake8's default behavior.
 
 **Outcome:** All 17 loader tests passed. `utils/flashcard_loader.py` achieved 100% test coverage with 49 statements and no missing lines. Black, Flake8, and mypy completed successfully for the loader and its tests.
 
@@ -88,23 +88,36 @@ For each AI interaction, create a new entry with the following structure:
 
 ---
 
-### [Date] - [Brief Description]
+### 2026-11-04 - Strategy Pattern for Quiz Modes
 
-**Context:** 
+**Context:** The application required three interchangeable quiz-ordering algorithms: sequential, random, and adaptive. The implementation needed to use the Strategy Pattern for a real architectural purpose while keeping card ordering separate from the future quiz loop, CLI, statistics, and persistence layers.
 
-**AI Tool Used:** 
+**AI Tool Used:** Claude Code
 
-**Prompt/Request:** 
+**Prompt/Request:** I used a structured XML-style prompt asking Claude Code to plan and implement only the Strategy Pattern in `utils/quiz_modes.py`. The prompt required one abstract strategy interface, three concrete strategies, no mutation of the original card list, type hints, English docstrings, standard-library-only implementation, and no unrelated changes.
 
-**AI Response:** 
+**AI Response:** Claude Code proposed `QuizModeStrategy` with a shared `order_cards()` method, plus `SequentialStrategy`, `RandomStrategy`, and `AdaptiveStrategy`. SequentialStrategy returned a copy in original order, RandomStrategy shuffled a copy, and AdaptiveStrategy prioritized missed cards using a defensively-copied set of indices.
 
-**Changes Made:** 
+**Changes Made:**
+- Required the abstract `order_cards()` method to raise `NotImplementedError` instead of using `pass`
+- Required `AdaptiveStrategy` to defensively copy the supplied `missed_indices` set
+- Clarified that negative and out-of-range indices should have no effect
+- Reduced the proposed test plan from 19 to 18 tests by combining two duplicate defensive-copy tests
+- Required random behavior to be tested deterministically by patching `utils.quiz_modes.random.shuffle`
+- Added explicit type annotations to empty card lists in the tests
+- Added a targeted `# type: ignore[abstract]` only for the intentional abstract-class instantiation test
+- Added `pyproject.toml` with Black configured to use a line length of 79
 
-**Reasoning:** 
+**Reasoning:** The Strategy Pattern cleanly separates the algorithms used to order flashcards and makes future quiz modes easier to add. Defensive copying prevents later changes to an external set from changing adaptive behavior. Deterministic mocking avoids unreliable tests that assume a random shuffle must change the order. Combining duplicate tests kept the suite focused. The targeted mypy suppression was appropriate because the test intentionally performs an operation that must fail at runtime. Configuring Black to use 79 characters aligned it with Flake8's default line-length rule.
 
-**Outcome:** 
+**Outcome:** All 18 Strategy Pattern tests passed. `utils/quiz_modes.py` achieved 96% coverage with 26 statements and one uncovered abstract-method line. The complete test suite passed with 35 tests. Combined coverage for the current `utils` package reached 99% with 75 statements and one missing line. Black, Flake8, and mypy completed successfully for all seven current Python source files.
 
-**Lessons Learned:** 
+**Lessons Learned:**
+- A design pattern should address a real variation point rather than be added only to satisfy a rubric
+- Random behavior should be tested with controlled mocking instead of probabilistic assertions
+- Defensive copying can be verified through public behavior without accessing private attributes
+- Static type checks may require narrow test-specific suppressions for intentionally invalid operations
+- Formatter and linter conflicts should be resolved through one consistent project configuration
 
 ---
 

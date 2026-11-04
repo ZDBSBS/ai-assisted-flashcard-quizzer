@@ -72,15 +72,19 @@ def _normalize_json_to_list(data: Any) -> list[Any]:
     if isinstance(data, dict):
         if "cards" not in data:
             raise ValueError(
-                "JSON object must contain a 'cards' key with a " "list of flashcards"
+                "JSON object must contain a 'cards' key with a "
+                "list of flashcards"
             )
         cards = data["cards"]
         if not isinstance(cards, list):
-            raise ValueError("The 'cards' field must be a list of flashcard objects")
+            raise ValueError(
+                "The 'cards' field must be a list of flashcard objects"
+            )
         return cards
 
     raise ValueError(
-        "JSON must be either a list of flashcards or an " "object with a 'cards' key"
+        "JSON must be either a list of flashcards or an "
+        "object with a 'cards' key"
     )
 
 
@@ -118,11 +122,13 @@ def _validate_card(card: Any, index: int) -> dict[str, str]:
     # Validate types
     if not isinstance(front, str):
         raise ValueError(
-            f"Card {index}: 'front' must be a string, " f"got {type(front).__name__}"
+            f"Card {index}: 'front' must be a string, "
+            f"got {type(front).__name__}"
         )
     if not isinstance(back, str):
         raise ValueError(
-            f"Card {index}: 'back' must be a string, " f"got {type(back).__name__}"
+            f"Card {index}: 'back' must be a string, "
+            f"got {type(back).__name__}"
         )
 
     # Validate non-empty (treat whitespace-only as empty)

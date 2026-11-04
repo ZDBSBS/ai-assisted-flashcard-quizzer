@@ -42,7 +42,9 @@ class TestValidCases:
         assert result[0] == {"front": "Q1", "back": "A1"}
         assert result[1] == {"front": "Q2", "back": "A2"}
 
-    def test_additional_fields_ignored_in_normalized_card(self, tmp_path: Path) -> None:
+    def test_additional_fields_ignored_in_normalized_card(
+        self, tmp_path: Path
+    ) -> None:
         """Verify that additional fields in cards are ignored."""
         test_data = [
             {
@@ -66,7 +68,9 @@ class TestValidCases:
 class TestFileAndPathErrors:
     """Test file and path validation."""
 
-    def test_missing_file_raises_file_not_found_error(self, tmp_path: Path) -> None:
+    def test_missing_file_raises_file_not_found_error(
+        self, tmp_path: Path
+    ) -> None:
         """Raise FileNotFoundError when file does not exist."""
         missing_file = tmp_path / "nonexistent.json"
 
@@ -104,7 +108,9 @@ class TestJSONStructureErrors:
         with pytest.raises(ValueError, match="must be either a list"):
             load_flashcards(str(json_file))
 
-    def test_object_without_cards_key_raises_value_error(self, tmp_path: Path) -> None:
+    def test_object_without_cards_key_raises_value_error(
+        self, tmp_path: Path
+    ) -> None:
         """Raise ValueError when object lacks 'cards' key."""
         test_data = {"data": [{"front": "Q", "back": "A"}]}
         json_file = tmp_path / "cards.json"
@@ -113,7 +119,9 @@ class TestJSONStructureErrors:
         with pytest.raises(ValueError, match="'cards' key"):
             load_flashcards(str(json_file))
 
-    def test_cards_value_not_list_raises_value_error(self, tmp_path: Path) -> None:
+    def test_cards_value_not_list_raises_value_error(
+        self, tmp_path: Path
+    ) -> None:
         """Raise ValueError when 'cards' value is not a list."""
         test_data = {"cards": {"front": "Q", "back": "A"}}
         json_file = tmp_path / "cards.json"
@@ -126,7 +134,9 @@ class TestJSONStructureErrors:
 class TestCardValidationErrors:
     """Test validation of individual flashcard objects."""
 
-    def test_card_not_dictionary_raises_value_error(self, tmp_path: Path) -> None:
+    def test_card_not_dictionary_raises_value_error(
+        self, tmp_path: Path
+    ) -> None:
         """Raise ValueError when a card is not a dictionary."""
         test_data = ["not a dict", {"front": "Q", "back": "A"}]
         json_file = tmp_path / "cards.json"
@@ -135,7 +145,9 @@ class TestCardValidationErrors:
         with pytest.raises(ValueError, match="Card 0.*expected a dictionary"):
             load_flashcards(str(json_file))
 
-    def test_card_missing_front_raises_value_error(self, tmp_path: Path) -> None:
+    def test_card_missing_front_raises_value_error(
+        self, tmp_path: Path
+    ) -> None:
         """Raise ValueError when a card is missing 'front'."""
         test_data = [{"back": "Answer"}]
         json_file = tmp_path / "cards.json"
@@ -144,7 +156,9 @@ class TestCardValidationErrors:
         with pytest.raises(ValueError, match="Card 0.*missing 'front'"):
             load_flashcards(str(json_file))
 
-    def test_card_missing_back_raises_value_error(self, tmp_path: Path) -> None:
+    def test_card_missing_back_raises_value_error(
+        self, tmp_path: Path
+    ) -> None:
         """Raise ValueError when a card is missing 'back'."""
         test_data = [{"front": "Question"}]
         json_file = tmp_path / "cards.json"
@@ -159,7 +173,9 @@ class TestCardValidationErrors:
         json_file = tmp_path / "cards.json"
         json_file.write_text(json.dumps(test_data))
 
-        with pytest.raises(ValueError, match="Card 0.*'front' must be a string"):
+        with pytest.raises(
+            ValueError, match="Card 0.*'front' must be a string"
+        ):
             load_flashcards(str(json_file))
 
     def test_back_not_string_raises_value_error(self, tmp_path: Path) -> None:
@@ -168,38 +184,54 @@ class TestCardValidationErrors:
         json_file = tmp_path / "cards.json"
         json_file.write_text(json.dumps(test_data))
 
-        with pytest.raises(ValueError, match="Card 0.*'back' must be a string"):
+        with pytest.raises(
+            ValueError, match="Card 0.*'back' must be a string"
+        ):
             load_flashcards(str(json_file))
 
-    def test_empty_front_string_raises_value_error(self, tmp_path: Path) -> None:
+    def test_empty_front_string_raises_value_error(
+        self, tmp_path: Path
+    ) -> None:
         """Raise ValueError when 'front' is an empty string."""
         test_data = [{"front": "", "back": "Answer"}]
         json_file = tmp_path / "cards.json"
         json_file.write_text(json.dumps(test_data))
 
-        with pytest.raises(ValueError, match="Card 0.*'front' must be a non-empty"):
+        with pytest.raises(
+            ValueError, match="Card 0.*'front' must be a non-empty"
+        ):
             load_flashcards(str(json_file))
 
-    def test_empty_back_string_raises_value_error(self, tmp_path: Path) -> None:
+    def test_empty_back_string_raises_value_error(
+        self, tmp_path: Path
+    ) -> None:
         """Raise ValueError when 'back' is an empty string."""
         test_data = [{"front": "Question", "back": ""}]
         json_file = tmp_path / "cards.json"
         json_file.write_text(json.dumps(test_data))
 
-        with pytest.raises(ValueError, match="Card 0.*'back' must be a non-empty"):
+        with pytest.raises(
+            ValueError, match="Card 0.*'back' must be a non-empty"
+        ):
             load_flashcards(str(json_file))
 
-    def test_whitespace_only_strings_raise_value_error(self, tmp_path: Path) -> None:
+    def test_whitespace_only_strings_raise_value_error(
+        self, tmp_path: Path
+    ) -> None:
         """Raise ValueError for whitespace-only strings."""
         test_data_front = [{"front": "   ", "back": "Answer"}]
         json_file = tmp_path / "cards.json"
         json_file.write_text(json.dumps(test_data_front))
 
-        with pytest.raises(ValueError, match="Card 0.*'front' must be a non-empty"):
+        with pytest.raises(
+            ValueError, match="Card 0.*'front' must be a non-empty"
+        ):
             load_flashcards(str(json_file))
 
         test_data_back = [{"front": "Question", "back": "\t\n"}]
         json_file.write_text(json.dumps(test_data_back))
 
-        with pytest.raises(ValueError, match="Card 0.*'back' must be a non-empty"):
+        with pytest.raises(
+            ValueError, match="Card 0.*'back' must be a non-empty"
+        ):
             load_flashcards(str(json_file))

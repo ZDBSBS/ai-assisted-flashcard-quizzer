@@ -186,6 +186,38 @@ For each AI interaction, create a new entry with the following structure:
 
 ---
 
+### 2026-11-04 - Final CLI Smoke Testing
+
+**Context:** After the automated tests passed, the three required quiz modes needed to be verified through real command-line executions using the provided JSON decks.
+
+**AI Tool Used:** Claude Code and Microsoft Copilot
+
+**Prompt/Request:** I requested a minimal smoke-test procedure for sequential, random, and adaptive modes. The commands supplied controlled incorrect answers through standard input so every question could be completed without manual interaction and the final statistics could be checked consistently.
+
+**AI Response:** The AI proposed separate terminal commands for all three quiz modes using the existing sample decks. Each command supplied enough intentionally incorrect answers to complete the selected deck and expose question presentation, immediate feedback, total-question counting, accuracy calculation, and missed-term reporting.
+
+**Changes Made:**
+- Ran sequential mode with `data/glossary.json`
+- Ran random mode with `data/glossary.json`
+- Ran adaptive mode with `data/python_basics.json`
+- Verified every question received immediate `Incorrect` feedback
+- Verified the expected question counts and zero-percent accuracy
+- Confirmed that missed terms followed the actual quiz order
+- Confirmed that no expected execution produced a traceback
+
+**Reasoning:** Automated unit tests verify components in isolation, but real CLI smoke tests confirm that argument parsing, file loading, strategy selection, quiz execution, terminal input, feedback, and summary output work together. Intentionally incorrect answers made the expected summary deterministic while still allowing random card ordering.
+
+**Outcome:** Sequential mode completed 10 questions in source order with 0.0% accuracy. Random mode completed the same 10 questions in a shuffled order with 0.0% accuracy. Adaptive mode completed all 8 Python Basics questions with 0.0% accuracy. All runs displayed immediate feedback, complete missed-term lists, and no stack traces.
+
+**Lessons Learned:**
+- Unit tests should be complemented by real command-line smoke tests
+- Deterministic input makes interactive workflows repeatable
+- Random mode should be validated by card completeness rather than one expected order
+- Final output should be checked from a user's perspective
+- A project should not be marked complete until automated and manual validation agree
+
+---
+
 ## Tips for Effective AI Collaboration
 
 ### 1. Be Specific in Your Requests
